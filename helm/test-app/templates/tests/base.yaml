@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-super-world-test
+  labels:
+    {{- include "test-app.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: curl-test
+      image: curlimages/curl
+      command:
+        - 'sh'
+        - '-c'
+        - |
+          for i in {1..10}; do
+            response=$(curl -s {{ include "test-app.fullname" . }}:{{ .Values.service.port }}/?super=1)
+            echo "Attempt $i: Response - $response"
+            if [[ "$response" == *"Super world!"* ]]; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Test failed - Expected response not received"
+          exit 1
+  restartPolicy: Never
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-hello-world-test
+  labels:
+    {{- include "test-app.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: curl-test
+      image: curlimages/curl
+      command:
+        - 'sh'
+        - '-c'
+        - |
+          for i in {1..10}; do
+            response=$(curl -s {{ include "test-app.fullname" . }}:{{ .Values.service.port }})
+            echo "Attempt $i: Response - $response"
+            if [[ "$response" == *"Hello, world!"* ]]; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Test failed - Expected response not received"
+          exit 1
+  restartPolicy: Never

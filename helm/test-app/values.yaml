@@ -1,0 +1,11 @@
+# values.yaml
+
+image:
+  repository: docker.io/smolnax/ng-lua
+  tag: "1.0"
+  pullPolicy: IfNotPresent
+
+service:
+  name: test-app
+  type: ClusterIP
+  port: 8080
